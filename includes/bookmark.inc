@@ -364,7 +364,7 @@ abstract class Bookmark implements BookmarkInterface {
    *   theme_tableselect().
    */
   protected function getTableHeader() {
-    $header = array('markup' => array('data' => t('Label')));
+    $header = array('markup' => array('data' => t('Item')));
     if ($this->managementAccess()) {
       $header['remove'] = array('data' => t('Operations'));
     }
@@ -434,7 +434,7 @@ abstract class Bookmark implements BookmarkInterface {
         '#weight' => 0,
         'fieldset' => array(
           '#type' => 'fieldset',
-          '#title' => 'Detailed List',
+          '#title' => 'Items',
           '#prefix' => '<div id="islandora-bookmark-detailed-list">',
           '#suffix' => '</div>',
         ),
@@ -460,7 +460,7 @@ abstract class Bookmark implements BookmarkInterface {
     $table = $this->getTable($pids);
     $form['bookmarks']['fieldset'] += array(
       'table' => $table += array(
-        '#empty' => t('@type list is empty.', array(
+        '#empty' => t('@type is empty.', array(
       '@type' => ucwords(variable_get('islandora_bookmark_type', 'bookmark')),
     )),
         '#weight' => -2,
@@ -478,7 +478,7 @@ abstract class Bookmark implements BookmarkInterface {
       $this->formAddActions($form['bookmarks']['fieldset'], $form_state);
     }
 
-    $this->formAddSecondaryActions($form, $form_state);
+    //$this->formAddSecondaryActions($form, $form_state);
 
     return $form;
   }
@@ -519,7 +519,7 @@ abstract class Bookmark implements BookmarkInterface {
     if (user_access('export islandora bookmarks')) {
       $export_styles = array();
       $export = islandora_bookmark_get_export_options();
-      $export_options['default'] = t('- Export type -');
+      //$export_options['default'] = t('- Export type -');
       // As export options can be user configurable and want to maintain
       // human readability through the UI need to account for the fact that
       // some options could have spaces in them. If spaces are encountered in
@@ -544,7 +544,7 @@ abstract class Bookmark implements BookmarkInterface {
       foreach ($export_styles as $key => $value) {
         if (!empty($value)) {
           $style_elements[$key] = array(
-            '#type' => 'select',
+            '#type' => 'hidden',
             '#title' => t('Style'),
             '#options' => $value,
             '#weight' => 0,
@@ -557,27 +557,50 @@ abstract class Bookmark implements BookmarkInterface {
         }
       }
 
+      $scale = variable_get('islandora_zip_download_size_limits')['scale'];
+
+       switch ($scale) {
+        // not entirly accurate since we use power of 2 values, but this is more familiar to end users
+        case "30":
+          $unit = 'GB';
+          break;
+        case "20":
+          $unit = 'MB';
+          break;
+        case "10":
+          $unit = 'KB';
+          break;
+      }
+
       $groups += array(
         'export_title' => array(
-          '#markup' => '<h3>' . t('Export') . '</h3>',
+          '#markup' => '<h3>' . t('Checkout') . '</h3>',
           '#weight' => 3,
         ),
+        'export_description' => array(
+          '#markup' => '<p>' . t('Upon checkout, a ZIP file will be created that contains all files within the items in your Basket, or within the items you\'ve selected above.
+           If you wish, you can limit the types of files that are added to the ZIP by selecting them in the list below. Only files to which you have access will be added to the ZIP.
+           The creation of the ZIP file will take some time, depending on the size of your selection. You will receive an email once it\'s ready for download.
+           The total amount that can be added to a ZIP (before compression) is maximised at @size @unit. If your selection is larger, only a part that fits within @size @unit will be included.', array(
+              '@size' => variable_get('islandora_zip_download_size_limits')['source_limit'],
+              '@unit' => $unit)
+            ) . '</p>',
+          '#weight' => 3.1,
+        ),
         'export_options' => array(
-          '#type' => 'select',
+          '#type' => 'hidden',
           '#title' => t('Format'),
-          '#options' => $export_options,
+          //'#options' => $export_options,
+          '#disabled' => TRUE,
           '#weight' => 4,
+          '#value' => 'ZIP',
         ),
         'format_opts' => array(
           '#weight' => 5,
           'export_styles' => $style_elements,
           'export_selected' => array(
             '#type' => 'submit',
-            '#value' => t('Export selected @type', array(
-              // XXX: Should be made better for translating... (Not all
-              // languages add an "s" to pluralize).
-              '@type' => variable_get('islandora_bookmark_type', 'bookmark') . 's',
-            )),
+            '#value' => t('Checkout selected items'),
             '#weight' => 5,
             '#action_validate' => array(
               'formHasExportTypeSelected',
@@ -589,11 +612,7 @@ abstract class Bookmark implements BookmarkInterface {
           ),
           'export_all' => array(
             '#type' => 'submit',
-            '#value' => t('Export all @type', array(
-              // XXX: Should be made better for translating... (Not all
-              // languages add an "s" to pluralize).
-              '@type' => variable_get('islandora_bookmark_type', 'bookmark') . 's',
-            )),
+            '#value' => t('Checkout all items'),
             '#weight' => 6,
             '#action_validate' => array(
               'formHasExportTypeSelected',
@@ -614,6 +633,7 @@ abstract class Bookmark implements BookmarkInterface {
   /**
    * Add secondary actions to the form.
    */
+
   protected function formAddSecondaryActions(&$form, &$form_state) {
     global $user;
     // Share.
@@ -788,6 +808,8 @@ abstract class Bookmark implements BookmarkInterface {
     }
   }
 
+
+
   /**
    * Form validation callback; ensure at least one object is selected.
    */
@@ -929,7 +951,7 @@ abstract class Bookmark implements BookmarkInterface {
       $this->removePids($pids_to_remove);
 
       foreach (array_map('islandora_object_load', $pids_to_remove) as $removed_object) {
-        drupal_set_message(t('The @type @objectname has been removed from @listname.', array(
+        drupal_set_message(t('The item @objectname has been removed from @listname.', array(
           '@type' => variable_get('islandora_bookmark_type', 'bookmark'),
           '@listname' => $this->bookmarkName,
           '@objectname' => $removed_object->label,

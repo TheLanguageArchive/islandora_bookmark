@@ -57,6 +57,7 @@ function template_preprocess_islandora_bookmark_list_columns(array &$variables) 
  * Implements theme_hook().
  */
 function theme_islandora_bookmark_list_links(array &$variables) {
+  /*
   $links = array('#weight' => -1);
   $module_path = drupal_get_path('module', 'islandora_bookmark');
   if ($variables['current'] != '') {
@@ -89,6 +90,8 @@ function theme_islandora_bookmark_list_links(array &$variables) {
   );
   drupal_add_css($module_path . '/css/list-links.css');
   return $links;
+  */
+
 }
 
 /**
