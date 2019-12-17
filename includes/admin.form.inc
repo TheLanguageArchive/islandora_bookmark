@@ -82,6 +82,12 @@ function islandora_bookmark_admin_settings(array $form, array &$form_state) {
         'islandora_bookmark_list_columns' => t('Columns'),
       ),
     ),
+    'islandora_bookmark_blacklist' => array(
+      '#type' => 'textarea',
+      '#title' => t('Blacklist PIDs.'),
+      '#description' => t('Comma separated list of Fedora PIDs on which the bookmark block should not be shown.'),
+      '#default_value' => variable_get('islandora_bookmark_blacklist', ''),
+    ),
     'submit' => array(
       '#type' => 'submit',
       '#value' => t('Save configuration'),
@@ -133,6 +139,7 @@ function islandora_bookmark_admin_settings_submit(array $form, array &$form_stat
         variable_set('islandora_bookmark_share_default_list', $form_state['values']['share_with_everyone']);
       }
       variable_set('islandora_bookmark_default_list_view', $form_state['values']['islandora_bookmark_default_list_view']);
+      variable_set('islandora_bookmark_blacklist', $form_state['values']['islandora_bookmark_blacklist']);
       break;
 
     case 'edit-reset':
@@ -144,6 +151,7 @@ function islandora_bookmark_admin_settings_submit(array $form, array &$form_stat
       variable_del('islandora_bookmark_default_list_name');
       variable_del('islandora_bookmark_share_default_list');
       variable_del('islandora_bookmark_default_list_view');
+      variable_del('islandora_bookmark_blacklist');
       break;
   }
 }
