@@ -749,10 +749,6 @@ function islandora_bookmark_fedora_repository_object_form(array $form, array &$f
 
     $containing_lists = islandora_bookmark_get_bookmarks_visible_to_user($pid, $user->uid);
 
-    if (islandora_bookmark_blacklisted($pid)) {
-      return;
-    }
-
     $form = array(
       '#prefix' => '<div id="islandora-bookmark">',
       '#suffix' => '</div>',

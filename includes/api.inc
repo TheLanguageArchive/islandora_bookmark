@@ -147,31 +147,6 @@ EOQ;
 }
 
 /**
- * Checks whether the current PID is blacklisted
- *
- * @param string $pid
- *   The object's PID.
- *
- * @return bool
- *   Return true if PID is blacklisted
- */
-function islandora_bookmark_blacklisted($pid) {
-  $blacklist = variable_get('islandora_bookmark_blacklist', FALSE);
-  if (empty($blacklist)) {
-    return FALSE;
-  }
-  else {
-    $blacklist_array = explode(',', $blacklist);
-    if (in_array($pid, $blacklist_array)) {
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
-  }
-}
-
-/**
  * Retrieves all the pids from the bookmark list id.
  *
  * @param string $value
