@@ -966,7 +966,7 @@ abstract class Bookmark implements BookmarkInterface {
     }
 
     $errors = form_get_errors();
-    if (count($errors) === 0) {
+    if (empty($errors)) {
       $page = pager_default_initialize(
           $this->getPidCount(), variable_get('islandora_bookmark_detailed_page_elements', 10), $form_state['islandora_bookmark_pager_element']
       );
